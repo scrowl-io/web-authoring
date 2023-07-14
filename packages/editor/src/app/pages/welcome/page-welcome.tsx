@@ -5,10 +5,12 @@ import * as css from './page-welcome.scss';
 import { animations } from '../../components';
 import { Projects, Users, Workspaces } from '../../models';
 import { menu } from '../../services';
+import { useOAuth } from '../../contexts/oauth';
 
 export const Path = '/welcome';
 
 export const Page = () => {
+  const oauth = useOAuth();
   const [inProgress, setProgress] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const isReady = useRef(false);
@@ -21,11 +23,11 @@ export const Page = () => {
 
     setProgress(true);
     Users.create().then((userRes) => {
-      console.log('userRes', userRes);
       if (userRes.error) {
         return;
       }
 
+      oauth?.update(userRes.data.id);
       Users.setData(userRes.data);
       Workspaces.create(userRes.data.id).then((workspaceRes) => {
         if (workspaceRes.error) {
